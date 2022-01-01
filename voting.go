@@ -13,6 +13,7 @@ func init() {
 	}
 
 	handleDatabase()
+	handleServices()
 }
 
 func main() {
