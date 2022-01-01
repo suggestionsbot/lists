@@ -1,0 +1,44 @@
+[services]
+
+[services.topgg]
+id = 0
+short_name = "topgg"
+long_name = "Top.gg"
+url = "https://top.gg"
+get_stats_url = "https://top.gg/api/bots/474051954998509571/stats"
+post_stats_url = "https://top.gg/api/bots/474051954998509571/stats"
+enabled = true
+
+[services.botsgg]
+id = 1
+short_name = "botsgg"
+long_name = "Discord Bots"
+url = "https://discord.bots.gg"
+get_stats_url = "https://discord.bots.gg/api/v1/bots/474051954998509571"
+post_stats_url = "https://discord.bots.gg/api/v1/bots/474051954998509571/stats"
+enabled = true
+
+[services.dlspace]
+id = 2
+short_name = "dlspace"
+long_name = "discordlist.space"
+url = "https://discordlist.space"
+get_stats_url = "https://api.discordlist.space/v2/bots/474051954998509571"
+post_stats_url = "https://api.discordlist.space/v2/bots/474051954998509571"
+enabled = true
+
+[services.dbl]
+id = 3
+short_name = "dbl"
+long_name = "Discord Bot List"
+url = "https://discordbotlist.com"
+get_stats_url = "https://discordbotlist.com/api/v1/bots/474051954998509571"
+post_stats_url = "https://discordbotlist.com/api/v1/bots/474051954998509571/stats"
+
+[services.discords]
+id = 4
+short_name = "discords"
+long_name = "Discords.com"
+url = "https://discords.com"
+get_stats_url = "https://discords.com/bots/api/bot/474051954998509571"
+post_stats_url = "https://discords.com/bots/api/bot/474051954998509571"
