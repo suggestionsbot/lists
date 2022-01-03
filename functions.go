@@ -89,7 +89,7 @@ func formErrorMessage(ctx *fiber.Ctx, err error) error {
 	))
 }
 
-func getBodyFromBotListService(httpClient *http.Client, service string) (map[string]interface{}, error) {
+func getDataFromBotListService(httpClient *http.Client, service string) (map[string]interface{}, error) {
 	url := services.Get(fmt.Sprintf("services.%s.get_stats_url", service)).(string)
 	token := os.Getenv(fmt.Sprintf("SERVICES_%s_TOKEN", utils.ToUpper(service)))
 
