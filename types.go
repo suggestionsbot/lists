@@ -13,6 +13,17 @@ type BotListServiceResponse struct {
 }
 
 type BotListServicesResponse struct {
-	Services    []*BotListServiceResponse `json:"services"`
-	LastUpdated int64                     `json:"last_upated"`
+	Services    []BotListServiceResponse `json:"services"`
+	LastUpdated int64                    `json:"last_upated"`
+}
+
+type BotListServiceConfig struct {
+	Id           int64
+	ShortName    string
+	LongName     string
+	Url          string
+	GetStatsUrl  string
+	PostStatsUrl string
+	Accessor     string
+	Enabled      bool
 }

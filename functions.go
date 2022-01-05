@@ -6,13 +6,17 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/joeycumines/go-dotnotation/dotnotation"
 	"github.com/pelletier/go-toml"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -25,6 +29,7 @@ func handleServer() {
 		ErrorHandler: formErrorMessage,
 	})
 
+	app.Use(recover.New())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "http://localhost:3000, https://api.suggestions.gg, https://suggestions.gg, https://suggestions-voting.ngrok.io",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization, User-Agent",
@@ -89,33 +94,69 @@ func formErrorMessage(ctx *fiber.Ctx, err error) error {
 	))
 }
 
-func getDataFromBotListService(httpClient *http.Client, service string) (map[string]interface{}, error) {
-	url := services.Get(fmt.Sprintf("services.%s.get_stats_url", service)).(string)
-	token := os.Getenv(fmt.Sprintf("SERVICES_%s_TOKEN", utils.ToUpper(service)))
+func fetchStats(httpClient *http.Client, service string, responses *[]BotListServiceResponse, wg *sync.WaitGroup, errors *chan error) {
+	token := getServiceToken(service)
+	config := getServiceConfig(service)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", config.GetStatsUrl, nil)
 	if err != nil {
-		return nil, err
+		*errors <- err
 	}
 
 	req.Header.Set("Authorization", token)
 
 	resp, respErr := httpClient.Do(req)
 	if respErr != nil {
-		return nil, respErr
+		*errors <- respErr
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			*errors <- err
+		}
+	}(resp.Body)
 
 	body, bodyErr := ioutil.ReadAll(resp.Body)
 	if bodyErr != nil {
-		return nil, bodyErr
+		*errors <- bodyErr
 	}
 
-	var bodyData map[string]interface{}
-	bodyDataErr := json.Unmarshal([]byte(body), &bodyData)
+	var bodyData interface{}
+	bodyDataErr := json.Unmarshal(body, &bodyData)
 	if bodyDataErr != nil {
-		return nil, bodyDataErr
+		*errors <- bodyDataErr
 	}
 
-	return bodyData, nil
+	var BotListAccessor dotnotation.Accessor
+
+	guildCount, gcErr := BotListAccessor.Get(bodyData, config.Accessor)
+	if gcErr != nil {
+		*errors <- gcErr
+	}
+
+	*responses = append(*responses, BotListServiceResponse{
+		Id:         config.Id,
+		ShortName:  config.ShortName,
+		Url:        config.Url,
+		GuildCount: int64(guildCount.(float64)),
+	})
+
+	wg.Done()
+}
+
+func getServiceConfig(service string) BotListServiceConfig {
+	return BotListServiceConfig{
+		Id:           services.Get(fmt.Sprintf("services.%s.id", service)).(int64),
+		ShortName:    services.Get(fmt.Sprintf("services.%s.short_name", service)).(string),
+		LongName:     services.Get(fmt.Sprintf("services.%s.long_name", service)).(string),
+		Url:          services.Get(fmt.Sprintf("services.%s.url", service)).(string),
+		GetStatsUrl:  services.Get(fmt.Sprintf("services.%s.get_stats_url", service)).(string),
+		PostStatsUrl: services.Get(fmt.Sprintf("services.%s.post_stats_url", service)).(string),
+		Accessor:     services.Get(fmt.Sprintf("services.%s.accessor", service)).(string),
+		Enabled:      services.Get(fmt.Sprintf("services.%s.enabled", service)).(bool),
+	}
+}
+
+func getServiceToken(service string) string {
+	return os.Getenv(fmt.Sprintf("SERVICES_%s_TOKEN", utils.ToUpper(service)))
 }
