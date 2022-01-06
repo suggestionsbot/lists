@@ -84,7 +84,7 @@ func formErrorMessage(ctx *fiber.Ctx, err error) error {
 		message = e.Message
 	}
 
-	return ctx.JSON(formJsonBody(
+	return ctx.Status(code).JSON(formJsonBody(
 		fiber.Map{
 			"code":    code,
 			"message": message,
