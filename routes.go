@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -12,21 +11,27 @@ func getRootRoute(ctx *fiber.Ctx) error {
 	))
 }
 
-// TODO: Handle validation
 func postGuildCountRoute(ctx *fiber.Ctx) error {
-	var jsonObj GuildCountResponse
-	if err := json.Unmarshal(ctx.Body(), &jsonObj); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	guild := new(GuildCountRequestBody)
+
+	if err := ctx.BodyParser(guild); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	errors := validateGuildCount(*guild)
+	if errors != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(formJsonBody(errors, false))
 	}
 
 	query := "insert into guildcount(guild_count, timestamp) values (%d, %d) returning *"
-	_, execErr := execQuery(query, jsonObj.Count, jsonObj.Timestamp)
+	_, execErr := execQuery(query, guild.Count, guild.Timestamp)
 	if execErr != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, execErr.Error())
 	}
 
 	return ctx.JSON(formJsonBody(GuildCountResponse{
-		Count: jsonObj.Count,
+		Count:     guild.Count,
+		Timestamp: guild.Timestamp,
 	}, true))
 }
 

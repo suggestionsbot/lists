@@ -5,6 +5,11 @@ type GuildCountResponse struct {
 	Timestamp int64 `json:"timestamp"`
 }
 
+type GuildCountRequestBody struct {
+	Count     int64 `json:"guild_count" validate:"required,number"`
+	Timestamp int64 `json:"timestamp" validate:"required,number"`
+}
+
 type BotListServiceResponse struct {
 	Id         int64  `json:"id"`
 	ShortName  string `json:"short_name"`
@@ -26,4 +31,10 @@ type BotListServiceConfig struct {
 	PostStatsUrl string
 	Accessor     string
 	Enabled      bool
+}
+
+type ErrorResponse struct {
+	FailedField string
+	Tag         string
+	Value       string
 }

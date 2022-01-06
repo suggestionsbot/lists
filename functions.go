@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -194,4 +195,21 @@ func execQuery(query string, args ...interface{}) (pgconn.CommandTag, error) {
 
 func queryRow(query string, args ...interface{}) error {
 	return conn.QueryRow(context.Background(), query).Scan(args...)
+}
+
+func validateGuildCount(guild GuildCountRequestBody) []*ErrorResponse {
+	var errors []*ErrorResponse
+	validate := validator.New()
+	err := validate.Struct(guild)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element ErrorResponse
+			element.FailedField = err.StructNamespace()
+			element.Tag = err.Tag()
+			element.Value = err.Param()
+			errors = append(errors, &element)
+		}
+	}
+
+	return errors
 }
