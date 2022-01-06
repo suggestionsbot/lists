@@ -1,13 +1,8 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"net/http"
-	"sync"
-	"time"
 )
 
 func getRootRoute(ctx *fiber.Ctx) error {
@@ -24,12 +19,11 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	commandTags, execErr := conn.Exec(context.Background(), fmt.Sprintf("insert into guildcount(guild_count, timestamp) values(%d, %d) returning *", jsonObj.Count, jsonObj.Timestamp))
+	query := "insert into guildcount(guild_count, timestamp) values (%d, %d) returning *"
+	_, execErr := execQuery(query, jsonObj.Count, jsonObj.Timestamp)
 	if execErr != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, execErr.Error())
 	}
-
-	fmt.Printf("Rows affected: %d", commandTags.RowsAffected())
 
 	return ctx.JSON(formJsonBody(GuildCountResponse{
 		Count: jsonObj.Count,
@@ -39,7 +33,9 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 func getGuildCount(ctx *fiber.Ctx) error {
 	var guildCount int64
 	var timestamp int64
-	err := conn.QueryRow(context.Background(), "select guild_count, timestamp from guildcount order by timestamp desc fetch first row only").Scan(&guildCount, &timestamp)
+
+	query := "select guild_count, timestamp from guildcount order by timestamp desc"
+	err := queryRow(query, &guildCount, &timestamp)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -53,39 +49,28 @@ func getGuildCount(ctx *fiber.Ctx) error {
 }
 
 func getBotListServices(ctx *fiber.Ctx) error {
-	var responses []BotListServiceResponse
+	responses, errors := fetchBotListServiceData()
+	if len(errors) >= 1 {
+		var data []interface{}
+		for _, err := range errors {
+			data = append(data, err)
+		}
 
-	var wg sync.WaitGroup
-	wg.Add(5)
+		ctx.Status(fiber.StatusInternalServerError)
+		return ctx.JSON(formJsonBody(data, false))
+	}
 
-	wgErrors := make(chan error)
-	wgDone := make(chan bool)
-
-	client := &http.Client{Timeout: time.Second * 30}
-
-	go fetchStats(client, "topgg", &responses, &wg, &wgErrors)
-	go fetchStats(client, "botsgg", &responses, &wg, &wgErrors)
-	go fetchStats(client, "dlspace", &responses, &wg, &wgErrors)
-	go fetchStats(client, "dbl", &responses, &wg, &wgErrors)
-	go fetchStats(client, "discords", &responses, &wg, &wgErrors)
-
-	go func() {
-		wg.Wait()
-		close(wgDone)
-	}()
-
-	select {
-	case <-wgDone:
-		break
-	case err := <-wgErrors:
-		close(wgErrors)
-		panic(err)
+	var timestamp int64
+	query := "select timestamp from guildcount order by timestamp desc"
+	queryRowError := queryRow(query, &timestamp)
+	if queryRowError != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, queryRowError.Error())
 	}
 
 	return ctx.JSON(formJsonBody(
 		BotListServicesResponse{
 			Services:    responses,
-			LastUpdated: time.Now().UnixMilli(),
+			LastUpdated: timestamp,
 		},
 		true,
 	))
