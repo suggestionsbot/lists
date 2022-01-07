@@ -8,6 +8,7 @@ url = "https://top.gg"
 get_stats_url = "https://top.gg/api/bots/474051954998509571/stats"
 post_stats_url = "https://top.gg/api/bots/474051954998509571/stats"
 accessor = "server_count"
+key = "server_count"
 enabled = true
 
 [services.botsgg]
@@ -18,6 +19,7 @@ url = "https://discord.bots.gg"
 get_stats_url = "https://discord.bots.gg/api/v1/bots/474051954998509571"
 post_stats_url = "https://discord.bots.gg/api/v1/bots/474051954998509571/stats"
 accessor = "guildCount"
+key = "guildCount"
 enabled = true
 
 [services.dlspace]
@@ -28,6 +30,7 @@ url = "https://discordlist.space"
 get_stats_url = "https://api.discordlist.space/v2/bots/474051954998509571"
 post_stats_url = "https://api.discordlist.space/v2/bots/474051954998509571"
 accessor = "serverCount"
+key = "serverCount"
 enabled = true
 
 [services.dbl]
@@ -38,6 +41,7 @@ url = "https://discordbotlist.com"
 get_stats_url = "https://discordbotlist.com/api/v1/bots/474051954998509571"
 post_stats_url = "https://discordbotlist.com/api/v1/bots/474051954998509571/stats"
 accessor = "stats.guilds"
+key = "guilds"
 enabled = true
 
 [services.discords]
@@ -48,4 +52,5 @@ url = "https://discords.com"
 get_stats_url = "https://discords.com/bots/api/bot/474051954998509571"
 post_stats_url = "https://discords.com/bots/api/bot/474051954998509571"
 accessor = "server_count"
+key = "server_count"
 enabled = true

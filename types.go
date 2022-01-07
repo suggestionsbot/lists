@@ -30,6 +30,7 @@ type BotListServiceConfig struct {
 	GetStatsUrl  string
 	PostStatsUrl string
 	Accessor     string
+	Key          string
 	Enabled      bool
 }
 
