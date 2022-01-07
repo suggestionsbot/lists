@@ -1,6 +1,7 @@
 package main
 
 import (
+	bytes2 "bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -38,10 +39,10 @@ func handleServer() {
 
 	app.Get("/", getRootRoute)
 
-	app.Post("/guildCount", postGuildCountRoute)
-	app.Get("/guildCount", getGuildCount)
+	app.Post("/guilds", postGuildCountRoute)
+	app.Get("/guilds", getGuildCountRoute)
 
-	app.Get("/services", getBotListServices)
+	app.Get("/services", getBotListServicesRoute)
 
 	log.Fatal(app.Listen(":3000"))
 }
@@ -138,6 +139,69 @@ func fetchStats(httpClient *http.Client, config BotListServiceConfig) (*BotListS
 	}, nil
 }
 
+func postStatsToBotList(httpClient *http.Client, service BotListServiceConfig, guildCount int64) error {
+	token := getServiceToken(service.ShortName)
+
+	data := fiber.Map{service.Key: fmt.Sprintf("%d", guildCount)}
+	jsonData, jsonErr := json.Marshal(data)
+	if jsonErr != nil {
+		return jsonErr
+	}
+
+	req, err := http.NewRequest("POST", service.PostStatsUrl, bytes2.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", token)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, respErr := httpClient.Do(req)
+	if respErr != nil {
+		return respErr
+	}
+
+	var res fiber.Map
+	decErr := json.NewDecoder(resp.Body).Decode(&res)
+	if decErr != nil {
+		return decErr
+	}
+
+	return nil
+}
+
+func postStatsToBotLists(guildCount int64) []error {
+	wg := sync.WaitGroup{}
+	locker := sync.Mutex{}
+
+	var errors []error
+	configs := [5]string{"topgg", "botsgg", "dlspace", "dbl", "discords"}
+
+	client := &http.Client{Timeout: time.Second * 30}
+
+	for _, config := range configs {
+		wg.Add(1)
+		go func(c BotListServiceConfig) {
+			defer wg.Done()
+
+			err := postStatsToBotList(client, c, guildCount)
+			if err != nil {
+				errors = append(errors, err)
+				return
+			}
+
+			locker.Lock()
+			defer locker.Unlock()
+
+			return
+		}(getServiceConfig(config))
+	}
+
+	wg.Wait()
+
+	return errors
+}
+
 func fetchBotListServiceData() ([]BotListServiceResponse, []error) {
 	wg := sync.WaitGroup{}
 	locker := sync.Mutex{}
@@ -182,6 +246,7 @@ func getServiceConfig(service string) BotListServiceConfig {
 		GetStatsUrl:  services.Get(fmt.Sprintf("services.%s.get_stats_url", service)).(string),
 		PostStatsUrl: services.Get(fmt.Sprintf("services.%s.post_stats_url", service)).(string),
 		Accessor:     services.Get(fmt.Sprintf("services.%s.accessor", service)).(string),
+		Key:          services.Get(fmt.Sprintf("services.%s.key", service)).(string),
 		Enabled:      services.Get(fmt.Sprintf("services.%s.enabled", service)).(bool),
 	}
 }

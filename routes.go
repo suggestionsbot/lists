@@ -40,7 +40,7 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 	}, true))
 }
 
-func getGuildCount(ctx *fiber.Ctx) error {
+func getGuildCountRoute(ctx *fiber.Ctx) error {
 	var guildCount int64
 	var timestamp int64
 
@@ -58,7 +58,7 @@ func getGuildCount(ctx *fiber.Ctx) error {
 	))
 }
 
-func getBotListServices(ctx *fiber.Ctx) error {
+func getBotListServicesRoute(ctx *fiber.Ctx) error {
 	responses, errors := fetchBotListServiceData()
 	if len(errors) > 0 {
 		return handleBotListErrors(ctx, errors)
