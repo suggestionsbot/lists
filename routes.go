@@ -29,6 +29,11 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, execErr.Error())
 	}
 
+	postErrors := postStatsToBotLists(guild.Count)
+	if len(postErrors) > 0 {
+		return handleBotListErrors(ctx, postErrors)
+	}
+
 	return ctx.JSON(formJsonBody(GuildCountResponse{
 		Count:     guild.Count,
 		Timestamp: guild.Timestamp,
@@ -55,14 +60,8 @@ func getGuildCount(ctx *fiber.Ctx) error {
 
 func getBotListServices(ctx *fiber.Ctx) error {
 	responses, errors := fetchBotListServiceData()
-	if len(errors) >= 1 {
-		var data []interface{}
-		for _, err := range errors {
-			data = append(data, err)
-		}
-
-		ctx.Status(fiber.StatusInternalServerError)
-		return ctx.JSON(formJsonBody(data, false))
+	if len(errors) > 0 {
+		return handleBotListErrors(ctx, errors)
 	}
 
 	var timestamp int64

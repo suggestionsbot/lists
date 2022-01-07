@@ -215,3 +215,13 @@ func validateGuildCount(guild GuildCountRequestBody) []*ErrorResponse {
 
 	return errors
 }
+
+func handleBotListErrors(ctx *fiber.Ctx, errors []error) error {
+	var data []interface{}
+	for _, err := range errors {
+		data = append(data, err)
+	}
+
+	ctx.Status(fiber.StatusInternalServerError)
+	return ctx.JSON(formJsonBody(data, false))
+}
