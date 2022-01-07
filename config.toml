@@ -1,3 +1,19 @@
+[api]
+port = 3000
+
+[api.logger]
+format = "[${ip}]:${port} ${status} - ${method} ${path}\n"
+time_format = "02-Jan-2006 15:04:05"
+timezone = "America/New_York"
+
+[api.auth]
+header_key = "header:Authorization"
+header_prefix = "Bearer"
+
+[api.cors]
+allow_origins = ["http://localhost:3000, https://api.suggestions.gg, https://suggestions.gg, https://suggestionsvoting.ngrok.io"]
+allow_headers = ["Origin, Content-Type, Accept, Authorization, User-Agent"]
+
 [services]
 
 [services.topgg]

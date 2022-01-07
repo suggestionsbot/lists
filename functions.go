@@ -25,7 +25,7 @@ import (
 )
 
 var conn *pgxpool.Pool
-var services *toml.Tree
+var config *toml.Tree
 
 func handleServer() {
 	app := fiber.New(fiber.Config{
@@ -33,20 +33,20 @@ func handleServer() {
 	})
 
 	app.Use(logger.New(logger.Config{
-		Format:     "[${ip}]:${port} ${status} - ${method} ${path}\n",
-		TimeFormat: "02-Jan-2006 15:04:05",
-		TimeZone:   "America/New_York",
+		Format:     config.Get("api.logger.format").(string),
+		TimeFormat: config.Get("api.logger.time_format").(string),
+		TimeZone:   config.Get("api.logger.timezone").(string),
 	}))
 	app.Use(keyauth.New(keyauth.Config{
-		KeyLookup:    "header:Authorization",
-		AuthScheme:   "Bearer",
+		KeyLookup:    config.Get("api.auth.header_key").(string),
+		AuthScheme:   config.Get("api.auth.header_prefix").(string),
 		ErrorHandler: formErrorMessage,
 		Validator:    validateAuthToken,
 	}))
 	app.Use(recover.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000, https://api.suggestions.gg, https://suggestions.gg, https://suggestionsvoting.ngrok.io",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization, User-Agent",
+		AllowOrigins: config.GetArray("api.cors.allow_origins").(string),
+		AllowHeaders: config.GetArray("api.cors.allow_headers").(string),
 	}))
 
 	app.Get("/", getRootRoute)
@@ -54,9 +54,10 @@ func handleServer() {
 	app.Post("/guilds", postGuildCountRoute)
 	app.Get("/guilds", getGuildCountRoute)
 
-	app.Get("/services", getBotListServicesRoute)
+	app.Get("/config", getBotListServicesRoute)
 
-	log.Fatal(app.Listen(":3000"))
+	port := config.Get("api.port").(int64)
+	log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))
 }
 
 func handleDatabase() {
@@ -71,12 +72,12 @@ func handleDatabase() {
 }
 
 func handleServices() {
-	doc, err := toml.LoadFile("services.toml")
+	doc, err := toml.LoadFile("config.toml")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	services = doc
+	config = doc
 
 	fmt.Println("Services config file loaded!")
 }
@@ -251,15 +252,15 @@ func fetchBotListServiceData() ([]BotListServiceResponse, []error) {
 
 func getServiceConfig(service string) BotListServiceConfig {
 	return BotListServiceConfig{
-		Id:           services.Get(fmt.Sprintf("services.%s.id", service)).(int64),
-		ShortName:    services.Get(fmt.Sprintf("services.%s.short_name", service)).(string),
-		LongName:     services.Get(fmt.Sprintf("services.%s.long_name", service)).(string),
-		Url:          services.Get(fmt.Sprintf("services.%s.url", service)).(string),
-		GetStatsUrl:  services.Get(fmt.Sprintf("services.%s.get_stats_url", service)).(string),
-		PostStatsUrl: services.Get(fmt.Sprintf("services.%s.post_stats_url", service)).(string),
-		Accessor:     services.Get(fmt.Sprintf("services.%s.accessor", service)).(string),
-		Key:          services.Get(fmt.Sprintf("services.%s.key", service)).(string),
-		Enabled:      services.Get(fmt.Sprintf("services.%s.enabled", service)).(bool),
+		Id:           config.Get(fmt.Sprintf("services.%s.id", service)).(int64),
+		ShortName:    config.Get(fmt.Sprintf("services.%s.short_name", service)).(string),
+		LongName:     config.Get(fmt.Sprintf("services.%s.long_name", service)).(string),
+		Url:          config.Get(fmt.Sprintf("services.%s.url", service)).(string),
+		GetStatsUrl:  config.Get(fmt.Sprintf("services.%s.get_stats_url", service)).(string),
+		PostStatsUrl: config.Get(fmt.Sprintf("services.%s.post_stats_url", service)).(string),
+		Accessor:     config.Get(fmt.Sprintf("services.%s.accessor", service)).(string),
+		Key:          config.Get(fmt.Sprintf("services.%s.key", service)).(string),
+		Enabled:      config.Get(fmt.Sprintf("services.%s.enabled", service)).(bool),
 	}
 }
 
