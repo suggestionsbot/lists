@@ -11,8 +11,8 @@ header_key = "header:Authorization"
 header_prefix = "Bearer"
 
 [api.cors]
-allow_origins = ["http://localhost:3000, https://api.suggestions.gg, https://suggestions.gg, https://suggestionsvoting.ngrok.io"]
-allow_headers = ["Origin, Content-Type, Accept, Authorization, User-Agent"]
+allow_origins = "http://localhost:3000, https://api.suggestions.gg, https://suggestions.gg, https://suggestionsvoting.ngrok.io"
+allow_headers = "Origin, Content-Type, Accept, Authorization, User-Agent"
 
 [services]
 
