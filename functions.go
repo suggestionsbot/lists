@@ -8,8 +8,10 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gofiber/keyauth/v2"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joeycumines/go-dotnotation/dotnotation"
@@ -26,14 +28,24 @@ var conn *pgxpool.Pool
 var services *toml.Tree
 
 func handleServer() {
-	// TODO: Handle authentication
 	app := fiber.New(fiber.Config{
 		ErrorHandler: formErrorMessage,
 	})
 
+	app.Use(logger.New(logger.Config{
+		Format:     "[${ip}]:${port} ${status} - ${method} ${path}\n",
+		TimeFormat: "02-Jan-2006 15:04:05",
+		TimeZone:   "America/New_York",
+	}))
+	app.Use(keyauth.New(keyauth.Config{
+		KeyLookup:    "header:Authorization",
+		AuthScheme:   "Bearer",
+		ErrorHandler: formErrorMessage,
+		Validator:    validateAuthToken,
+	}))
 	app.Use(recover.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000, https://api.suggestions.gg, https://suggestions.gg, https://suggestions-voting.ngrok.io",
+		AllowOrigins: "http://localhost:3000, https://api.suggestions.gg, https://suggestions.gg, https://suggestionsvoting.ngrok.io",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization, User-Agent",
 	}))
 
@@ -289,4 +301,14 @@ func handleBotListErrors(ctx *fiber.Ctx, errors []error) error {
 
 	ctx.Status(fiber.StatusInternalServerError)
 	return ctx.JSON(formJsonBody(data, false))
+}
+
+func validateAuthToken(_ *fiber.Ctx, token string) (bool, error) {
+	tk := os.Getenv("API_TOKEN")
+
+	if token != tk {
+		return false, nil
+	}
+
+	return true, nil
 }
