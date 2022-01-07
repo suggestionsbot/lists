@@ -83,6 +83,8 @@ func formErrorMessage(ctx *fiber.Ctx, err error) error {
 	if e, ok := err.(*fiber.Error); ok {
 		code = e.Code
 		message = e.Message
+	} else if err.Error() != "" {
+		message = err.Error()
 	}
 
 	return ctx.Status(code).JSON(formJsonBody(
