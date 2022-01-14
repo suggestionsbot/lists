@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"log"
+	"os"
 )
 
 func init() {
-	envErr := godotenv.Load()
-	if envErr != nil {
+	if err := godotenv.Load(".env.local", ".env"); err != nil && !os.IsNotExist(err) {
 		log.Fatal("Error loading .env file")
 	}
 
