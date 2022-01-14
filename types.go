@@ -11,7 +11,6 @@ type GuildCountRequestBody struct {
 }
 
 type BotListServiceResponse struct {
-	Id         int64  `json:"id"`
 	ShortName  string `json:"short_name"`
 	Url        string `json:"url"`
 	GuildCount int64  `json:"guild_count"`
@@ -23,7 +22,6 @@ type BotListServicesResponse struct {
 }
 
 type BotListServiceConfig struct {
-	Id           int64
 	ShortName    string
 	LongName     string
 	Url          string

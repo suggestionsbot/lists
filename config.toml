@@ -1,5 +1,4 @@
 [api]
-port = 3000
 
 [api.logger]
 format = "[${ip}]:${port} ${status} - ${method} ${path}\n"
@@ -17,7 +16,6 @@ allow_headers = "Origin, Content-Type, Accept, Authorization, User-Agent"
 [services]
 
 [services.topgg]
-id = 0
 short_name = "topgg"
 long_name = "Top.gg"
 url = "https://top.gg"
@@ -28,7 +26,6 @@ key = "server_count"
 enabled = true
 
 [services.botsgg]
-id = 1
 short_name = "botsgg"
 long_name = "Discord Bots"
 url = "https://discord.bots.gg"
@@ -39,7 +36,6 @@ key = "guildCount"
 enabled = true
 
 [services.dlspace]
-id = 2
 short_name = "dlspace"
 long_name = "discordlist.space"
 url = "https://discordlist.space"
@@ -50,7 +46,6 @@ key = "serverCount"
 enabled = true
 
 [services.dbl]
-id = 3
 short_name = "dbl"
 long_name = "Discord Bot List"
 url = "https://discordbotlist.com"
@@ -61,7 +56,6 @@ key = "guilds"
 enabled = true
 
 [services.discords]
-id = 4
 short_name = "discords"
 long_name = "Discords.com"
 url = "https://discords.com"

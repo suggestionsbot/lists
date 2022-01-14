@@ -56,8 +56,8 @@ func handleServer() {
 
 	app.Get("/config", getBotListServicesRoute)
 
-	port := config.Get("api.port").(int64)
-	log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))
+	port := os.Getenv("API_PORT")
+	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
 }
 
 func handleDatabase() {
