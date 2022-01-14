@@ -22,3 +22,8 @@ tern/tern.conf
 
 # Environment variables
 .env
+.env.local
+.env.docker
+
+# Docker-compose
+docker-compose.dev.yml
