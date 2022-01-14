@@ -16,6 +16,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joeycumines/go-dotnotation/dotnotation"
 	"github.com/pelletier/go-toml"
+	"github.com/pelletier/go-toml/query"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -54,7 +55,7 @@ func handleServer() {
 	app.Post("/guilds", postGuildCountRoute)
 	app.Get("/guilds", getGuildCountRoute)
 
-	app.Get("/config", getBotListServicesRoute)
+	app.Get("/services", getBotListServicesRoute)
 
 	port := os.Getenv("API_PORT")
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
@@ -145,7 +146,6 @@ func fetchStats(httpClient *http.Client, config BotListServiceConfig) (*BotListS
 	}
 
 	return &BotListServiceResponse{
-		Id:         config.Id,
 		ShortName:  config.ShortName,
 		Url:        config.Url,
 		GuildCount: int64(guildCount.(float64)),
@@ -188,7 +188,7 @@ func postStatsToBotLists(guildCount int64) []error {
 	locker := sync.Mutex{}
 
 	var errors []error
-	configs := [5]string{"topgg", "botsgg", "dlspace", "dbl", "discords"}
+	configs := getActiveServices()
 
 	client := &http.Client{Timeout: time.Second * 30}
 
@@ -221,7 +221,7 @@ func fetchBotListServiceData() ([]BotListServiceResponse, []error) {
 
 	var responses []BotListServiceResponse
 	var errors []error
-	configs := [5]string{"topgg", "botsgg", "dlspace", "dbl", "discords"}
+	configs := getActiveServices()
 
 	client := &http.Client{Timeout: time.Second * 30}
 
@@ -252,7 +252,6 @@ func fetchBotListServiceData() ([]BotListServiceResponse, []error) {
 
 func getServiceConfig(service string) BotListServiceConfig {
 	return BotListServiceConfig{
-		Id:           config.Get(fmt.Sprintf("services.%s.id", service)).(int64),
 		ShortName:    config.Get(fmt.Sprintf("services.%s.short_name", service)).(string),
 		LongName:     config.Get(fmt.Sprintf("services.%s.long_name", service)).(string),
 		Url:          config.Get(fmt.Sprintf("services.%s.url", service)).(string),
@@ -312,4 +311,25 @@ func validateAuthToken(_ *fiber.Ctx, token string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func getActiveServices() []string {
+	var services []string
+
+	q, _ := query.Compile("$.services[?(active)].short_name")
+
+	q.SetFilter("active", func(node interface{}) bool {
+		if tree, ok := node.(*toml.Tree); ok {
+			return tree.Get("enabled").(bool) == true
+		}
+		return false
+	})
+
+	results := q.Execute(config)
+
+	for _, service := range results.Values() {
+		services = append(services, service.(string))
+	}
+
+	return services
 }
