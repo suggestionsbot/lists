@@ -1,0 +1,11 @@
+version: "3.3"
+
+services:
+  voting:
+    container_name: voting
+    image: ghcr.io/suggestionsbot/voting:latest
+    env_file:
+      - .env # check .env.example for details
+    restart: always
+    ports:
+      - "3000:3000"
