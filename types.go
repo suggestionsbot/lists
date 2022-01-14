@@ -18,7 +18,7 @@ type BotListServiceResponse struct {
 
 type BotListServicesResponse struct {
 	Services    []BotListServiceResponse `json:"services"`
-	LastUpdated int64                    `json:"last_upated"`
+	LastUpdated int64                    `json:"last_updated"`
 }
 
 type BotListServiceConfig struct {
