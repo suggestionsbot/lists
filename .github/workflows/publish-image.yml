@@ -18,5 +18,5 @@ jobs:
             username: ${{ github.actor }}
             password: ${{ github.token }}
             registry: ghcr.io
-            tags: latest
+            tags: latest,${{ github.event.release.tag_name }}
             build_args: BRANCH=${{ github.ref }},COMMIT=${{ github.sha }}
