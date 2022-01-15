@@ -52,10 +52,14 @@ func handleServer() {
 
 	app.Get("/", getRootRoute)
 
-	app.Post("/guilds", postGuildCountRoute)
-	app.Get("/guilds", getGuildCountRoute)
+	api := app.Group("/api")
 
-	app.Get("/services", getBotListServicesRoute)
+	v1 := api.Group("/v1")
+
+	v1.Post("/guilds", postGuildCountRoute)
+	v1.Get("/guilds", getGuildCountRoute)
+
+	v1.Get("/services", getBotListServicesRoute)
 
 	port := os.Getenv("API_PORT")
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
