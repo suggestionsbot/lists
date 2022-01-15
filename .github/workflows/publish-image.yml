@@ -16,9 +16,6 @@ jobs:
           id: meta
           uses: docker/metadata-action@v3
           with:
-            images: |
-              suggestionsbot/voting
-              ghcr.io/suggestionsbot/voting
             tags: |
               type=schedule
               type=ref,event=branch
