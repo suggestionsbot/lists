@@ -9,3 +9,40 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    networks:
+      - voting
+  psql:
+    container_name: psql
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: voting # the username for the default postgres user
+      POSTGRES_PASSWORD: voting # the password for the default postgres user
+      POSTGRES_DB: voting # the database for the postgres instance
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
+    networks:
+      - voting
+    command:
+      ["-path", "/migrations", "-database", "${POSTGRES_URL}", "up"]
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      - psql
+    env_file:
+      - .env
+    networks:
+      - voting
+    volumes:
+      - ./migrations:/migrations
+    command:
+      [ "-path", "/migrations", "-database", "postgres://voting:voting@psql:5442/voting?sslmode=disable", "up" ]
+
+networks:
+  voting:
+    internal: true
+
+volumes:
+  pgdata:
