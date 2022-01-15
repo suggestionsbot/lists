@@ -17,9 +17,6 @@
 # GoLand
 .idea/
 
-# Tern config for migrations
-tern/tern.conf
-
 # Environment variables
 .env
 .env.local
