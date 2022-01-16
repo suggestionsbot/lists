@@ -16,17 +16,15 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_USER: voting # the username for the default postgres user
-      POSTGRES_PASSWORD: voting # the password for the default postgres user
-      POSTGRES_DB: voting # the database for the postgres instance
+      POSTGRES_USER: ${POSTGRES_USER} # the username for the default postgres user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # the password for the default postgres user
+      POSTGRES_DB: ${POSTGRES_DB} # the database for the postgres instance
     volumes:
       - "pgdata:/var/lib/postgresql/data"
     ports:
       - "5432:5432"
     networks:
       - voting
-    command:
-      ["-path", "/migrations", "-database", "${POSTGRES_URL}", "up"]
   migrate:
     image: migrate/migrate
     depends_on:
@@ -38,7 +36,7 @@ services:
     volumes:
       - ./migrations:/migrations
     command:
-      [ "-path", "/migrations", "-database", "postgres://voting:voting@psql:5442/voting?sslmode=disable", "up" ]
+      [ "-path", "/migrations", "-database", "${POSTGRES_URL}", "up" ]
 
 networks:
   voting:
