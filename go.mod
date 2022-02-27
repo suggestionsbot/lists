@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/gofiber/fiber/v2 v2.27.0
-	github.com/gofiber/keyauth/v2 v2.1.15
+	github.com/gofiber/keyauth/v2 v2.1.17
 	github.com/jackc/pgconn v1.11.0
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/joeycumines/go-dotnotation v0.0.0-20180131115956-2d3612e36c5d

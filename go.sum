@@ -33,6 +33,8 @@ github.com/gofiber/fiber/v2 v2.27.0 h1:u34t1nOea7zz4jcZDK7+ZMiG+MVFYrHqMhTdYQDiF
 github.com/gofiber/fiber/v2 v2.27.0/go.mod h1:0bPXdTu+jRqINrEq1T6mHeVBnE0lQd67PGu35jD3hLk=
 github.com/gofiber/keyauth/v2 v2.1.15 h1:okW3e2nvxpRliKcHLE0wj9wGN5Q0Bgxz6jwzSFD/Z9U=
 github.com/gofiber/keyauth/v2 v2.1.15/go.mod h1:ZoBgbr5P2uluXkfxFf9PtJgsC1VXcV7VvoG1CG0QewU=
+github.com/gofiber/keyauth/v2 v2.1.17 h1:T1pAQoQ27HRfG29TwhfE+2rYTS2eCm+HHnqkWZCkFqc=
+github.com/gofiber/keyauth/v2 v2.1.17/go.mod h1:uJsuEtmhCKv/Dskg4lhXpzx92yLIXflPG+Ee5dG4cVk=
 github.com/gofrs/uuid v4.0.0+incompatible h1:1SD/1F5pU8p29ybwgQSwpQk+mwdRrXCYuPhW6m+TnJw=
 github.com/gofrs/uuid v4.0.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
 github.com/golang/snappy v0.0.3/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
