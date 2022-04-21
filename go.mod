@@ -10,7 +10,7 @@ require (
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/joeycumines/go-dotnotation v0.0.0-20180131115956-2d3612e36c5d
 	github.com/joho/godotenv v1.4.0
-	github.com/pelletier/go-toml v1.9.4
+	github.com/pelletier/go-toml v1.9.5
 )
 
 require (
