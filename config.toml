@@ -35,16 +35,6 @@ accessor = "guildCount"
 key = "guildCount"
 enabled = true
 
-[services.dlspace]
-short_name = "dlspace"
-long_name = "discordlist.space"
-url = "https://discordlist.space"
-get_stats_url = "https://api.discordlist.space/v2/bots/474051954998509571"
-post_stats_url = "https://api.discordlist.space/v2/bots/474051954998509571"
-accessor = "serverCount"
-key = "serverCount"
-enabled = true
-
 [services.dbl]
 short_name = "dbl"
 long_name = "Discord Bot List"
