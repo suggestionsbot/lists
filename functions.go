@@ -120,27 +120,47 @@ func fetchStats(httpClient *http.Client, config BotListServiceConfig) (*BotListS
 
 	req, err := http.NewRequest("GET", config.GetStatsUrl, nil)
 	if err != nil {
-		return nil, err
+		return &BotListServiceResponse{
+			ShortName:  config.ShortName,
+			Url:        config.Url,
+			GuildCount: 0,
+			Error:      true,
+		}, nil
 	}
 
 	req.Header.Set("Authorization", token)
 
 	resp, respErr := httpClient.Do(req)
 	if respErr != nil {
-		return nil, respErr
+		return &BotListServiceResponse{
+			ShortName:  config.ShortName,
+			Url:        config.Url,
+			GuildCount: 0,
+			Error:      true,
+		}, nil
 	}
 
 	defer resp.Body.Close()
 
 	body, bodyErr := ioutil.ReadAll(resp.Body)
 	if bodyErr != nil {
-		return nil, bodyErr
+		return &BotListServiceResponse{
+			ShortName:  config.ShortName,
+			Url:        config.Url,
+			GuildCount: 0,
+			Error:      true,
+		}, nil
 	}
 
 	var bodyData interface{}
 	bodyDataErr := json.Unmarshal(body, &bodyData)
 	if bodyDataErr != nil {
-		return nil, bodyDataErr
+		return &BotListServiceResponse{
+			ShortName:  config.ShortName,
+			Url:        config.Url,
+			GuildCount: 0,
+			Error:      true,
+		}, nil
 	}
 
 	var BotListAccessor dotnotation.Accessor

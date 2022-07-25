@@ -14,6 +14,7 @@ type BotListServiceResponse struct {
 	ShortName  string `json:"short_name"`
 	Url        string `json:"url"`
 	GuildCount int64  `json:"guild_count"`
+	Error      bool   `json:"error" validate:"omitempty"`
 }
 
 type BotListServicesResponse struct {
