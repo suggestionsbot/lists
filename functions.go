@@ -287,6 +287,10 @@ func getServiceConfig(service string) BotListServiceConfig {
 	}
 }
 
+func getVersion() string {
+	return config.Get("version").(string)
+}
+
 func getServiceToken(service string) string {
 	return os.Getenv(fmt.Sprintf("SERVICES_%s_TOKEN", utils.ToUpper(service)))
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"time"
 )
 
 func init() {
@@ -17,7 +18,12 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Voting v1.0 - Copyright (c) 2021 Anthony Collier")
+	version := getVersion()
+	date := time.Now()
+	year := date.Year()
+
+	message := fmt.Sprintf("Voting %s - Copyright (c) %d Anthony Collier", version, year)
+	fmt.Println(message)
 
 	handleServer()
 }
