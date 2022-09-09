@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/go-playground/validator/v10 v10.11.0
-	github.com/gofiber/fiber/v2 v2.35.0
-	github.com/gofiber/keyauth/v2 v2.1.24
+	github.com/gofiber/fiber/v2 v2.37.1
+	github.com/gofiber/keyauth/v2 v2.1.27
 	github.com/jackc/pgconn v1.12.1
 	github.com/jackc/pgx/v4 v4.16.1
 	github.com/joeycumines/go-dotnotation v0.0.0-20180131115956-2d3612e36c5d
@@ -28,7 +28,7 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.38.0 // indirect
+	github.com/valyala/fasthttp v1.40.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
