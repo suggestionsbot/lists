@@ -1,13 +1,15 @@
 package main
 
 type GuildCountResponse struct {
-	Count     int64 `json:"guild_count"`
+	Guilds    int64 `json:"guild_count"`
+	Shards    int64 `json:"shard_count"`
 	Timestamp int64 `json:"timestamp"`
 	DryRun    bool  `json:"dry_run"`
 }
 
 type GuildCountRequestBody struct {
-	Count  int64 `json:"guild_count" validate:"required,number"`
+	Guilds int64 `json:"guild_count" validate:"required,number"`
+	Shards int64 `json:"shard_count" validate:"required,number"`
 	DryRun bool  `json:"dry_run" validate:"boolean"`
 }
 

@@ -25,20 +25,21 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 	}
 
 	if !guild.DryRun {
-		query := "insert into guildcount(guild_count) values ($1) returning *"
-		_, execErr := execQuery(query, guild.Count)
+		query := "insert into guildcount(guild_count, shard_count) values ($1, $2) returning *"
+		_, execErr := execQuery(query, guild.Guilds, guild.Shards)
 		if execErr != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, execErr.Error())
 		}
 
-		postErrors := postStatsToBotLists(guild.Count)
+		postErrors := postStatsToBotLists(guild.Guilds, guild.Shards)
 		if len(postErrors) > 0 {
 			return handleBotListErrors(ctx, postErrors)
 		}
 	}
 
 	return ctx.JSON(formJsonBody(GuildCountResponse{
-		Count:     guild.Count,
+		Guilds:    guild.Guilds,
+		Shards:    guild.Shards,
 		DryRun:    guild.DryRun,
 		Timestamp: time.Now().UnixMilli(),
 	}, true))
@@ -46,17 +47,19 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 
 func getGuildCountRoute(ctx *fiber.Ctx) error {
 	var guildCount int64
+	var shardCount int64
 	var createdAt time.Time
 
-	query := "select guild_count, created_at from guildcount order by created_at desc"
-	err := queryRow(query, &guildCount, &createdAt)
+	query := "select guild_count, shard_count, created_at from guildcount order by created_at desc"
+	err := queryRow(query, &guildCount, &shardCount, &createdAt)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	return ctx.JSON(formJsonBody(
 		GuildCountResponse{
-			Count:     guildCount,
+			Guilds:    guildCount,
+			Shards:    shardCount,
 			Timestamp: createdAt.UnixMilli(),
 		}, true,
 	))

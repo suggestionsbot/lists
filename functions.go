@@ -176,10 +176,15 @@ func fetchStats(httpClient *http.Client, config BotListServiceConfig) (*BotListS
 	}, nil
 }
 
-func postStatsToBotList(httpClient *http.Client, service BotListServiceConfig, guildCount int64) error {
+func postStatsToBotList(httpClient *http.Client, service BotListServiceConfig, guildCount int64, shardCount int64) error {
 	token := getServiceToken(service.ShortName)
 
-	data := fiber.Map{service.Key: fmt.Sprintf("%d", guildCount)}
+	var data = fiber.Map{service.Key: guildCount}
+	if service.ShortName == "botsgg" {
+		withShardCount := &data
+		*withShardCount = fiber.Map{service.Key: guildCount, "shardCount": shardCount}
+	}
+
 	jsonData, jsonErr := json.Marshal(data)
 	if jsonErr != nil {
 		return jsonErr
@@ -204,10 +209,12 @@ func postStatsToBotList(httpClient *http.Client, service BotListServiceConfig, g
 		return decErr
 	}
 
+	log.Printf("service: %s, code: %d, response: %v", service.ShortName, resp.StatusCode, res)
+
 	return nil
 }
 
-func postStatsToBotLists(guildCount int64) []error {
+func postStatsToBotLists(guildCount int64, shardCount int64) []error {
 	wg := sync.WaitGroup{}
 	locker := sync.Mutex{}
 
@@ -221,7 +228,7 @@ func postStatsToBotLists(guildCount int64) []error {
 		go func(c BotListServiceConfig) {
 			defer wg.Done()
 
-			err := postStatsToBotList(client, c, guildCount)
+			err := postStatsToBotList(client, c, guildCount, shardCount)
 			if err != nil {
 				errors = append(errors, err)
 				return
