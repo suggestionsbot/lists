@@ -1,4 +1,4 @@
-module github.com/suggestionsbot/voting
+module github.com/suggestionsbot/lists
 
 go 1.17
 

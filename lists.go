@@ -22,7 +22,7 @@ func main() {
 	date := time.Now()
 	year := date.Year()
 
-	message := fmt.Sprintf("Voting %s - Copyright (c) %d Anthony Collier", version, year)
+	message := fmt.Sprintf("Lists %s - Copyright (c) %d Anthony Collier", version, year)
 	fmt.Println(message)
 
 	handleServer()

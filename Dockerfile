@@ -1,6 +1,6 @@
 FROM golang:1.17-alpine AS build
 
-WORKDIR /go/src/voting
+WORKDIR /go/src/lists
 
 COPY . .
 
@@ -10,10 +10,10 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o voti
 
 FROM alpine:latest
 
-WORKDIR /opt/voting
+WORKDIR /opt/lists
 
-COPY --from=build /go/src/voting .
+COPY --from=build /go/src/lists .
 
 EXPOSE 3000
 
-CMD ["./voting"]
+CMD ["./lists"]
