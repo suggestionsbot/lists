@@ -68,8 +68,8 @@ func getBotListServicesRoute(ctx *fiber.Ctx) error {
 		return handleBotListErrors(ctx, errors)
 	}
 
-	var timestamp int64
-	query := "select timestamp from guildcount order by timestamp desc"
+	var timestamp time.Time
+	query := "select created_at from guildcount order by created_at desc"
 	queryRowError := queryRow(query, &timestamp)
 	if queryRowError != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, queryRowError.Error())
@@ -78,7 +78,7 @@ func getBotListServicesRoute(ctx *fiber.Ctx) error {
 	return ctx.JSON(formJsonBody(
 		BotListServicesResponse{
 			Services:    responses,
-			LastUpdated: timestamp,
+			LastUpdated: timestamp.UnixMilli(),
 		},
 		true,
 	))
