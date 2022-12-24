@@ -17,7 +17,7 @@ import (
 	"github.com/joeycumines/go-dotnotation/dotnotation"
 	"github.com/pelletier/go-toml"
 	"github.com/pelletier/go-toml/query"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -142,7 +142,7 @@ func fetchStats(httpClient *http.Client, config BotListServiceConfig) (*BotListS
 
 	defer resp.Body.Close()
 
-	body, bodyErr := ioutil.ReadAll(resp.Body)
+	body, bodyErr := io.ReadAll(resp.Body)
 	if bodyErr != nil {
 		return &BotListServiceResponse{
 			ShortName:  config.ShortName,
