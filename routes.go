@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"time"
 )
 
 func getRootRoute(ctx *fiber.Ctx) error {
@@ -23,29 +24,32 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(formJsonBody(errors, false))
 	}
 
-	query := "insert into guildcount(guild_count, timestamp) values (%d, %d) returning *"
-	_, execErr := execQuery(query, guild.Count, guild.Timestamp)
-	if execErr != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, execErr.Error())
-	}
+	if !guild.DryRun {
+		query := "insert into guildcount(guild_count) values ($1) returning *"
+		_, execErr := execQuery(query, guild.Count)
+		if execErr != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, execErr.Error())
+		}
 
-	postErrors := postStatsToBotLists(guild.Count)
-	if len(postErrors) > 0 {
-		return handleBotListErrors(ctx, postErrors)
+		postErrors := postStatsToBotLists(guild.Count)
+		if len(postErrors) > 0 {
+			return handleBotListErrors(ctx, postErrors)
+		}
 	}
 
 	return ctx.JSON(formJsonBody(GuildCountResponse{
 		Count:     guild.Count,
-		Timestamp: guild.Timestamp,
+		DryRun:    guild.DryRun,
+		Timestamp: time.Now().UnixMilli(),
 	}, true))
 }
 
 func getGuildCountRoute(ctx *fiber.Ctx) error {
 	var guildCount int64
-	var timestamp int64
+	var createdAt time.Time
 
-	query := "select guild_count, timestamp from guildcount order by timestamp desc"
-	err := queryRow(query, &guildCount, &timestamp)
+	query := "select guild_count, created_at from guildcount order by created_at desc"
+	err := queryRow(query, &guildCount, &createdAt)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -53,7 +57,7 @@ func getGuildCountRoute(ctx *fiber.Ctx) error {
 	return ctx.JSON(formJsonBody(
 		GuildCountResponse{
 			Count:     guildCount,
-			Timestamp: timestamp,
+			Timestamp: createdAt.UnixMilli(),
 		}, true,
 	))
 }

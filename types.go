@@ -3,11 +3,12 @@ package main
 type GuildCountResponse struct {
 	Count     int64 `json:"guild_count"`
 	Timestamp int64 `json:"timestamp"`
+	DryRun    bool  `json:"dry_run"`
 }
 
 type GuildCountRequestBody struct {
-	Count     int64 `json:"guild_count" validate:"required,number"`
-	Timestamp int64 `json:"timestamp" validate:"required,number"`
+	Count  int64 `json:"guild_count" validate:"required,number"`
+	DryRun bool  `json:"dry_run" validate:"boolean"`
 }
 
 type BotListServiceResponse struct {
