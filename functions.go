@@ -296,8 +296,7 @@ func getServiceToken(service string) string {
 }
 
 func execQuery(query string, args ...interface{}) (pgconn.CommandTag, error) {
-	q := fmt.Sprintf(query, args...)
-	return conn.Exec(context.Background(), q)
+	return conn.Exec(context.Background(), query, args...)
 }
 
 func queryRow(query string, args ...interface{}) error {
