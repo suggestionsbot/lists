@@ -24,7 +24,7 @@ definitions:
           $ref: '#/definitions/main.BotListServiceResponse'
         type: array
     type: object
-  main.CustomFiberError:
+  main.DefaultFiberError:
     properties:
       code:
         example: 500
@@ -63,6 +63,15 @@ definitions:
         example: 1671940391185
         type: integer
     type: object
+  main.InvalidServiceError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: The service 'memelist' is not a valid service.
+        type: string
+    type: object
   main.ResponseHTTP:
     properties:
       data: {}
@@ -75,8 +84,7 @@ definitions:
     type: object
   main.ResponseHTTPError:
     properties:
-      data:
-        $ref: '#/definitions/main.CustomFiberError'
+      data: {}
       nonce:
         example: 1671940391185
         type: integer
@@ -196,6 +204,57 @@ paths:
           schema:
             $ref: '#/definitions/main.ResponseHTTPError'
       summary: Get all active lists the bot is on.
+      tags:
+      - General
+  /api/v1/services/{service}:
+    get:
+      consumes:
+      - application/json
+      description: This function returns the timestamp of when guild stats were lasted
+        committed to the database as well as an overview of the specific bot list
+        the bot is on.
+      parameters:
+      - description: The required API key
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: The bot list service to get information from.
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.ResponseHTTP'
+            - properties:
+                data:
+                  $ref: '#/definitions/main.BotListServicesResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.ResponseHTTPError'
+            - properties:
+                data:
+                  $ref: '#/definitions/main.InvalidServiceError'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.ResponseHTTPError'
+            - properties:
+                data:
+                  $ref: '#/definitions/main.DefaultFiberError'
+              type: object
+      summary: Get a single list the bot is on.
       tags:
       - General
 swagger: "2.0"

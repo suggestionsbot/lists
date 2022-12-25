@@ -181,6 +181,93 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/services/{service}": {
+            "get": {
+                "description": "This function returns the timestamp of when guild stats were lasted committed to the database as well as an overview of the specific bot list the bot is on.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "General"
+                ],
+                "summary": "Get a single list the bot is on.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The required API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "The bot list service to get information from.",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.ResponseHTTP"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/main.BotListServicesResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.ResponseHTTPError"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/main.InvalidServiceError"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.ResponseHTTPError"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/main.DefaultFiberError"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -220,7 +307,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.CustomFiberError": {
+        "main.DefaultFiberError": {
             "type": "object",
             "properties": {
                 "code": {
@@ -275,6 +362,19 @@ const docTemplate = `{
                 }
             }
         },
+        "main.InvalidServiceError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "example": "The service 'memelist' is not a valid service."
+                }
+            }
+        },
         "main.ResponseHTTP": {
             "type": "object",
             "properties": {
@@ -292,9 +392,7 @@ const docTemplate = `{
         "main.ResponseHTTPError": {
             "type": "object",
             "properties": {
-                "data": {
-                    "$ref": "#/definitions/main.CustomFiberError"
-                },
+                "data": {},
                 "nonce": {
                     "type": "integer",
                     "example": 1671940391185

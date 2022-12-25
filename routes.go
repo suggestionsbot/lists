@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"net/http"
 	"time"
 )
 
@@ -115,6 +117,64 @@ func getBotListServicesRoute(ctx *fiber.Ctx) error {
 	return ctx.JSON(formJsonBody(
 		BotListServicesResponse{
 			Services:    responses,
+			LastUpdated: timestamp.UnixMilli(),
+		},
+		true,
+	))
+}
+
+// getSingleBotListServiceRoute is a function to get an overview of the specific bot list the bot is on.
+//
+//	@Summary		Get a single list the bot is on.
+//	@Description	This function returns the timestamp of when guild stats were lasted committed to the database as well as an overview of the specific bot list the bot is on.
+//	@tags			General
+//	@Accept			json
+//	@Produce		json
+//	@Success		200				{object}	ResponseHTTP{data=BotListServicesResponse}
+//
+//	@Failure		400				{object}	ResponseHTTPError{data=InvalidServiceError}
+//
+//	@Failure		500				{object}	ResponseHTTPError{data=DefaultFiberError}
+//
+//	@Param			Authorization	header		string	true	"The required API key"
+//
+//	@Param			service			path		string	true	"The bot list service to get information from."
+//
+//	@Router			/api/v1/services/{service} [get]
+func getSingleBotListServiceRoute(ctx *fiber.Ctx) error {
+	service := ctx.Params("service")
+	activeServices := getActiveServices()
+	var services []BotListServiceResponse
+
+	for _, s := range activeServices {
+		if s == service {
+			config := getServiceConfig(service)
+			client := &http.Client{Timeout: time.Second * 30}
+			data, err := fetchStats(client, config)
+			if err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			}
+
+			services = append(services, *data)
+			break
+		}
+	}
+
+	if len(services) < 1 {
+		msg := fmt.Sprintf("The service '%s' is not a valid service.", service)
+		return fiber.NewError(fiber.StatusBadRequest, msg)
+	}
+
+	var timestamp time.Time
+	query := "select created_at from guildcount order by created_at desc"
+	queryRowError := queryRow(query, &timestamp)
+	if queryRowError != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, queryRowError.Error())
+	}
+
+	return ctx.JSON(formJsonBody(
+		BotListServicesResponse{
+			Services:    services,
 			LastUpdated: timestamp.UnixMilli(),
 		},
 		true,

@@ -48,13 +48,18 @@ type ResponseHTTP struct {
 	Nonce   int64       `json:"nonce" example:"1671940391185"`
 }
 
-type CustomFiberError struct {
+type DefaultFiberError struct {
 	Code    int    `json:"code" example:"500"`
 	Message string `json:"message" example:"missing or malformed API Key"`
 }
 
+type InvalidServiceError struct {
+	Code    int    `json:"code" example:"400"`
+	Message string `json:"message" example:"The service 'memelist' is not a valid service."`
+}
+
 type ResponseHTTPError struct {
-	Data    CustomFiberError `json:"data"`
-	Success bool             `json:"success" example:"false"`
-	Nonce   int64            `json:"nonce" example:"1671940391185"`
+	Data    interface{} `json:"data"`
+	Success bool        `json:"success" example:"false"`
+	Nonce   int64       `json:"nonce" example:"1671940391185"`
 }

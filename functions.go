@@ -59,6 +59,7 @@ func handleServer() {
 	v1.Get("/guilds", getGuildCountRoute)
 
 	v1.Get("/services", getBotListServicesRoute)
+	v1.Get("/services/:service", getSingleBotListServiceRoute)
 
 	port := os.Getenv("API_PORT")
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
