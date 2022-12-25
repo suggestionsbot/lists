@@ -1,0 +1,204 @@
+definitions:
+  main.BotListServiceResponse:
+    properties:
+      error:
+        example: false
+        type: boolean
+      guild_count:
+        example: 50000
+        type: integer
+      short_name:
+        example: topgg
+        type: string
+      url:
+        example: https://top.gg
+        type: string
+    type: object
+  main.BotListServicesResponse:
+    properties:
+      last_updated:
+        example: 1671940391185
+        type: integer
+      services:
+        items:
+          $ref: '#/definitions/main.BotListServiceResponse'
+        type: array
+    type: object
+  main.CustomFiberError:
+    properties:
+      code:
+        example: 500
+        type: integer
+      message:
+        example: missing or malformed API Key
+        type: string
+    type: object
+  main.GuildCountRequestBody:
+    properties:
+      dry_run:
+        example: true
+        type: boolean
+      guild_count:
+        example: 50000
+        type: integer
+      shard_count:
+        example: 50
+        type: integer
+    required:
+    - guild_count
+    - shard_count
+    type: object
+  main.GuildCountResponse:
+    properties:
+      dry_run:
+        example: false
+        type: boolean
+      guild_count:
+        example: 50000
+        type: integer
+      shard_count:
+        example: 50
+        type: integer
+      timestamp:
+        example: 1671940391185
+        type: integer
+    type: object
+  main.ResponseHTTP:
+    properties:
+      data: {}
+      nonce:
+        example: 1671940391185
+        type: integer
+      success:
+        example: true
+        type: boolean
+    type: object
+  main.ResponseHTTPError:
+    properties:
+      data:
+        $ref: '#/definitions/main.CustomFiberError'
+      nonce:
+        example: 1671940391185
+        type: integer
+      success:
+        example: false
+        type: boolean
+    type: object
+info:
+  contact:
+    email: hello@suggestions.gg
+    name: Suggestions
+    url: https://suggestions.bot/discord
+  description: The API key used to secure all API routes, preventing unauthorized
+    access.
+  license:
+    name: AGPL-3.0
+    url: https://github.com/suggestionsbot/lists/blob/main/LICENSE
+  termsOfService: https://suggestions.gg/terms
+  title: Suggestions Lists
+  version: "1.1"
+paths:
+  /api/v1/guilds:
+    get:
+      consumes:
+      - application/json
+      description: The most recently posted guild and shard count in the database
+        is returned as well as the timestamp of when this data was committed. This
+        data reflects the guild count on the active bot lists.
+      parameters:
+      - description: The required API key
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.ResponseHTTP'
+            - properties:
+                data:
+                  $ref: '#/definitions/main.GuildCountResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ResponseHTTPError'
+      summary: Get the recent guild count from the database.
+      tags:
+      - General
+    post:
+      consumes:
+      - application/json
+      description: The guild count and shard count are persisted to the database then
+        posted to all active bot lists set in the config.
+      parameters:
+      - description: The required API key
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: The request body to pass in.
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.GuildCountRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.ResponseHTTP'
+            - properties:
+                data:
+                  $ref: '#/definitions/main.GuildCountResponse'
+              type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/main.ResponseHTTPError'
+      summary: Post guild stats to bot lists and persist them in the database.
+      tags:
+      - General
+  /api/v1/services:
+    get:
+      consumes:
+      - application/json
+      description: This function returns the timestamp of when guild stats were lasted
+        committed to the database as well as an overview of all information from bot
+        lists that are marked active via the config.
+      parameters:
+      - description: The required API key
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.ResponseHTTP'
+            - properties:
+                data:
+                  $ref: '#/definitions/main.BotListServicesResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ResponseHTTPError'
+      summary: Get all active lists the bot is on.
+      tags:
+      - General
+swagger: "2.0"
+tags:
+- description: All routes for the service.
+  name: General

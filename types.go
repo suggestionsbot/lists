@@ -1,28 +1,28 @@
 package main
 
 type GuildCountResponse struct {
-	Guilds    int64 `json:"guild_count"`
-	Shards    int64 `json:"shard_count"`
-	Timestamp int64 `json:"timestamp"`
-	DryRun    bool  `json:"dry_run"`
+	Guilds    int64 `json:"guild_count" example:"50000"`
+	Shards    int64 `json:"shard_count" example:"50"`
+	Timestamp int64 `json:"timestamp" example:"1671940391185"`
+	DryRun    bool  `json:"dry_run" example:"false"`
 }
 
 type GuildCountRequestBody struct {
-	Guilds int64 `json:"guild_count" validate:"required,number"`
-	Shards int64 `json:"shard_count" validate:"required,number"`
-	DryRun bool  `json:"dry_run" validate:"boolean"`
+	Guilds int64 `json:"guild_count" validate:"required,number" example:"50000"`
+	Shards int64 `json:"shard_count" validate:"required,number" example:"50"`
+	DryRun bool  `json:"dry_run" validate:"boolean" example:"true"`
 }
 
 type BotListServiceResponse struct {
-	ShortName  string `json:"short_name"`
-	Url        string `json:"url"`
-	GuildCount int64  `json:"guild_count"`
-	Error      bool   `json:"error" validate:"omitempty"`
+	ShortName  string `json:"short_name" example:"topgg"`
+	Url        string `json:"url" example:"https://top.gg"`
+	GuildCount int64  `json:"guild_count" example:"50000"`
+	Error      bool   `json:"error" validate:"omitempty" example:"false"`
 }
 
 type BotListServicesResponse struct {
 	Services    []BotListServiceResponse `json:"services"`
-	LastUpdated int64                    `json:"last_updated"`
+	LastUpdated int64                    `json:"last_updated" example:"1671940391185"`
 }
 
 type BotListServiceConfig struct {
@@ -40,4 +40,21 @@ type ErrorResponse struct {
 	FailedField string
 	Tag         string
 	Value       string
+}
+
+type ResponseHTTP struct {
+	Data    interface{} `json:"data"`
+	Success bool        `json:"success" example:"true"`
+	Nonce   int64       `json:"nonce" example:"1671940391185"`
+}
+
+type CustomFiberError struct {
+	Code    int    `json:"code" example:"500"`
+	Message string `json:"message" example:"missing or malformed API Key"`
+}
+
+type ResponseHTTPError struct {
+	Data    CustomFiberError `json:"data"`
+	Success bool             `json:"success" example:"false"`
+	Nonce   int64            `json:"nonce" example:"1671940391185"`
 }

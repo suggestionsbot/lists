@@ -6,7 +6,7 @@ COPY . .
 
 RUN go mod download
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o voting .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o main .
 
 FROM alpine:latest
 
@@ -16,4 +16,4 @@ COPY --from=build /go/src/lists .
 
 EXPOSE 3000
 
-CMD ["./lists"]
+CMD ["./main"]

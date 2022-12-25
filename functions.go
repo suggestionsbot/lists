@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gofiber/keyauth/v2"
+	"github.com/gofiber/swagger"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joeycumines/go-dotnotation/dotnotation"
@@ -38,23 +39,21 @@ func handleServer() {
 		TimeFormat: config.Get("api.logger.time_format").(string),
 		TimeZone:   config.Get("api.logger.timezone").(string),
 	}))
-	app.Use(keyauth.New(keyauth.Config{
-		KeyLookup:    config.Get("api.auth.header_key").(string),
-		AuthScheme:   config.Get("api.auth.header_prefix").(string),
-		ErrorHandler: formErrorMessage,
-		Validator:    validateAuthToken,
-	}))
 	app.Use(recover.New())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: config.GetArray("api.cors.allow_origins").(string),
 		AllowHeaders: config.GetArray("api.cors.allow_headers").(string),
 	}))
-
-	app.Get("/", getRootRoute)
+	app.Get("/docs/*", swagger.HandlerDefault)
 
 	api := app.Group("/api")
 
 	v1 := api.Group("/v1")
+	v1.Use(keyauth.New(keyauth.Config{
+		KeyLookup:    config.Get("api.auth.header_key").(string),
+		ErrorHandler: formErrorMessage,
+		Validator:    validateAuthToken,
+	}))
 
 	v1.Post("/guilds", postGuildCountRoute)
 	v1.Get("/guilds", getGuildCountRoute)
@@ -87,11 +86,11 @@ func loadConfig() {
 	fmt.Println("Services config file loaded!")
 }
 
-func formJsonBody(data interface{}, success bool) fiber.Map {
-	return fiber.Map{
-		"data":    data,
-		"success": success,
-		"nonce":   time.Now().UnixMilli(),
+func formJsonBody(data interface{}, success bool) ResponseHTTP {
+	return ResponseHTTP{
+		Data:    data,
+		Success: success,
+		Nonce:   time.Now().UnixMilli(),
 	}
 }
 

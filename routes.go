@@ -5,13 +5,21 @@ import (
 	"time"
 )
 
-func getRootRoute(ctx *fiber.Ctx) error {
-	return ctx.JSON(formJsonBody(
-		fiber.Map{"message": "Hello world!"},
-		true,
-	))
-}
-
+// postGuildCountRoute is a function that used to post guild count information to all bot lists and be persisted in the database.
+//
+//	@Summary		Post guild stats to bot lists and persist them in the database.
+//	@Description	The guild count and shard count are persisted to the database then posted to all active bot lists set in the config.
+//	@tags			General
+//	@Accept			json
+//	@Produce		json
+//	@Success		200				{object}	ResponseHTTP{data=GuildCountResponse}
+//	@Failure		503				{object}	ResponseHTTPError{}
+//
+//	@Param			Authorization	header		string					true	"The required API key"
+//
+//	@Param			request			body		GuildCountRequestBody	true	"The request body to pass in."
+//
+//	@Router			/api/v1/guilds [post]
 func postGuildCountRoute(ctx *fiber.Ctx) error {
 	guild := new(GuildCountRequestBody)
 
@@ -45,6 +53,19 @@ func postGuildCountRoute(ctx *fiber.Ctx) error {
 	}, true))
 }
 
+// getGuildCountRoute is a function that returns the most recently committed guild count in the database.
+//
+//	@Summary		Get the recent guild count from the database.
+//	@Description	The most recently posted guild and shard count in the database is returned as well as the timestamp of when this data was committed. This data reflects the guild count on the active bot lists.
+//	@tags			General
+//	@Accept			json
+//	@Produce		json
+//	@Success		200				{object}	ResponseHTTP{data=GuildCountResponse}
+//	@Failure		500				{object}	ResponseHTTPError{}
+//
+//	@Param			Authorization	header		string	true	"The required API key"
+//
+//	@Router			/api/v1/guilds [get]
 func getGuildCountRoute(ctx *fiber.Ctx) error {
 	var guildCount int64
 	var shardCount int64
@@ -65,6 +86,19 @@ func getGuildCountRoute(ctx *fiber.Ctx) error {
 	))
 }
 
+// getBotListServicesRoute is a function to get an overview of all active lists the bot is on.
+//
+//	@Summary		Get all active lists the bot is on.
+//	@Description	This function returns the timestamp of when guild stats were lasted committed to the database as well as an overview of all information from bot lists that are marked active via the config.
+//	@tags			General
+//	@Accept			json
+//	@Produce		json
+//	@Success		200				{object}	ResponseHTTP{data=BotListServicesResponse}
+//	@Failure		500				{object}	ResponseHTTPError{}
+//
+//	@Param			Authorization	header		string	true	"The required API key"
+//
+//	@Router			/api/v1/services [get]
 func getBotListServicesRoute(ctx *fiber.Ctx) error {
 	responses, errors := fetchBotListServiceData()
 	if len(errors) > 0 {
