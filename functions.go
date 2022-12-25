@@ -65,7 +65,7 @@ func handleServer() {
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
 }
 
-func handleDatabase() {
+func loadDatabase() {
 	dbpool, connErr := pgxpool.Connect(context.Background(), os.Getenv("POSTGRES_URL"))
 	if connErr != nil {
 		log.Fatal(connErr)
@@ -76,7 +76,7 @@ func handleDatabase() {
 	fmt.Println("PostgreSQL database connected!")
 }
 
-func handleServices() {
+func loadConfig() {
 	doc, err := toml.LoadFile("config.toml")
 	if err != nil {
 		log.Fatal(err)

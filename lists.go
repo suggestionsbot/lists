@@ -13,8 +13,8 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 
-	handleDatabase()
-	handleServices()
+	loadDatabase()
+	loadConfig()
 }
 
 func main() {
