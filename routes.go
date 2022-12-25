@@ -73,7 +73,7 @@ func getGuildCountRoute(ctx *fiber.Ctx) error {
 	var shardCount int64
 	var createdAt time.Time
 
-	query := "select guild_count, shard_count, created_at from guildcount order by created_at desc"
+	query := "select guild_count, shard_count, created_at from guildcount order by created_at"
 	err := queryRow(query, &guildCount, &shardCount, &createdAt)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -108,7 +108,7 @@ func getBotListServicesRoute(ctx *fiber.Ctx) error {
 	}
 
 	var timestamp time.Time
-	query := "select created_at from guildcount order by created_at desc"
+	query := "select created_at from guildcount order by created_at"
 	queryRowError := queryRow(query, &timestamp)
 	if queryRowError != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, queryRowError.Error())
@@ -166,7 +166,7 @@ func getSingleBotListServiceRoute(ctx *fiber.Ctx) error {
 	}
 
 	var timestamp time.Time
-	query := "select created_at from guildcount order by created_at desc"
+	query := "select created_at from guildcount order by created_at"
 	queryRowError := queryRow(query, &timestamp)
 	if queryRowError != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, queryRowError.Error())
