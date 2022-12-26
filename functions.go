@@ -209,8 +209,6 @@ func postStatsToBotList(httpClient *http.Client, service BotListServiceConfig, g
 		return decErr
 	}
 
-	log.Printf("service: %s, code: %d, response: %v", service.ShortName, resp.StatusCode, res)
-
 	return nil
 }
 
